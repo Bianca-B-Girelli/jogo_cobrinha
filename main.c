@@ -41,7 +41,7 @@ int main(void) {
     // 1. ETAPA DE INICIALIZAÇÃO E CONFIGURAÇÃO 
     // ---------------------------------------------------------------------------------
     const int larguraTela = 800;   // Definição da largura física da janela do jogo
-    const int alturaTela = 600;  // Definição da altura física da janela do jogo
+    const int alturaTela = 800;  // Definição da altura física da janela do jogo
     const float raioNave   = 20.0f;
     const float raioLua    = 20.0f;
     const float raioPewpew = 4.0f;
