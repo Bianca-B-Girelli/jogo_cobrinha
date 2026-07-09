@@ -15,13 +15,14 @@ typedef struct Cobra{
     int tamanho_largura;
     int tamanho_comprimento;
     Color cor;
-}Cobra;
-
+}Cobra;          //Cobra criada
+/*
 typedef struct Maca{
     Vector2 posicao;
     Texture2D imagem;
     bool ativo;
 }Maca;
+
 
 typedef struct quadradinhos{
     Vector2 posicao;
@@ -29,23 +30,37 @@ typedef struct quadradinhos{
     bool ocupado;
     bool maca;
 }
+*/
 
 int main(void){
     const int largura_tela = 1200; // 15 quadradinhos
     const int altura_tela = 800; //10 quadradinhos
 
 
-    InitWindow(larguraTela, alturaTela, "Jogo Da Cobrinha");
+    InitWindow(largura_tela, altura_tela, "Jogo Da Cobrinha");
+    Texture2D fundo = LoadTexture("fundo.png");
+
     SetTargetFPS(60);
 
     Cobra cobrinha;
-    cobrinha.posicao = (Vector2){ (float)largura_tela / 2.0f, (float)altur_tela / 2.0f };
+    cobrinha.posicao = (Vector2){ (float)largura_tela / 2.0f, (float)altura_tela / 2.0f };
     cobrinha.velocidade = 20.0;
     cobrinha.tamanho_largura = 80;
 
-    
-    
-    
+    while (!WindowShouldClose()) {
 
+        BeginDrawing();
+
+            ClearBackground(RAYWHITE);
+
+            DrawTexture(fundo, 0, 0, WHITE);
+
+        EndDrawing();
+    }
+
+    UnloadTexture(fundo);
+    CloseWindow();
+
+    return 0;
 
 }
