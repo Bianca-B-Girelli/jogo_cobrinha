@@ -113,6 +113,15 @@ int main(void){
             }
         }
 
+        BeginDrawing();
+
+            ClearBackground(RAYWHITE);
+
+            DrawTexture(fundo, 0, 0, WHITE);
+
+        EndDrawing();
     }
+    UnloadTexture(fundo);
+    CloseWindow();
 }
     
