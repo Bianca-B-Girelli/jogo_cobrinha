@@ -33,6 +33,16 @@ int main(void){
 
     SetTargetFPS(60);
 
+    // DESATIVAÇÃO DA TECLA ESCAPE NATIVA:
+    // O comando abaixo impede que pressionar a tecla ESC feche a janela do jogo.
+    // Isso é feito para que possamos usar o ESC como comando para voltar para o menu.
+    SetExitKey(KEY_P);
+
+    // Inicialização da máquina de estados e variáveis de fluxo de interface
+    EstadoJogo estadoAtual = MENU;
+    int opcaoSelecionada = 0;       // Representa a opção do menu: 0 = Jogar, 1 = Fechar
+    bool fecharJogo = false; // Flag de controle seguro para encerrar o laço
+
     Cobra cobrinha[4];
     for (int i=0;i<4;i++){
         cobrinha[i].posicao.x = 600; 
@@ -66,12 +76,10 @@ int main(void){
                 // Processamento de seleção de opções ao pressionar a tecla ENTER 
                 if (IsKeyPressed(KEY_ENTER)) {
                     if (opcaoSelecionada == 0) {
-                        // Reseta a nave espacial para o centro da tela antes de começar
-                        cobrinha.posicao = (Vector2){ (float)larguraTela / 2.0f, (float)alturaTela / 2.0f };
+                    //Aqui pode estar faltando a posição inicial da cobrinha
                         estadoAtual = JOGANDO;  // Muda o estado ativo para a jogabilidade
-                        projetil.ativo = false; 
-                        for (int i = 0; i < 10; i++) cobrinha[i].ativo = true; //cobrinha volta quando inicia dnv
-                    } else if (opcaoSelecionada == 1) {
+                    }
+                    else if (opcaoSelecionada == 1) {
                         fecharJogo = true; // Define a flag para encerrar o jogo com segurança
                     }
                 }
@@ -83,33 +91,38 @@ int main(void){
                 if (IsKeyPressed(KEY_ESCAPE)) {
                     estadoAtual = MENU; // Altera o estado sem fechar o programa de maneira abrupta [7]
                 }
+                for (int i=0;i<4;i++){
                 // Captura contínua de teclas para movimentação linear e suave da nave espacial 
                 if (IsKeyDown(KEY_LEFT) || IsKeyDown(KEY_A)) {
-                    cobrinha.posicao.x -= cobrinha.velocidade; // Desloca para a esquerda (subtrai no eixo X) 
+                    cobrinha[i].posicao.x -= cobrinha[i].velocidade; // Desloca para a esquerda (subtrai no eixo X) 
                 }
                 if (IsKeyDown(KEY_RIGHT) || IsKeyDown(KEY_D)) {
-                    cobrinha.posicao.x += cobrinha.velocidade; // Desloca para a direita (soma no eixo X) 
+                    cobrinha[i].posicao.x += cobrinha[i].velocidade; // Desloca para a direita (soma no eixo X) 
                 }
                 if (IsKeyDown(KEY_DOWN) || IsKeyDown(KEY_S)) {
-                    cobrinha.posicao.y += cobrinha.velocidade; // Desloca para a direita (soma no eixo X) 
+                    cobrinha[i].posicao.y += cobrinha[i].velocidade; // Desloca para a direita (soma no eixo X) 
                 }
                 if (IsKeyDown(KEY_UP) || IsKeyDown(KEY_W)) {
-                    cobrinha.posicao.y -= cobrinha.velocidade; // Desloca para cima (subtrai no eixo Y) 
-            }
+                    cobrinha[i].posicao.y -= cobrinha[i].velocidade; // Desloca para cima (subtrai no eixo Y) 
+                }
+                }
+
 
             // SISTEMA DE COLISÃO BÁSICO (Bordas de Tela):
                 // Limita as coordenadas da nave para evitar que o usuário saia do campo visível.
-                if (cobrinha.posicao.x < 40.0f){ 
-                    cobrinha.posicao.x = 40.0f;
+            for (int i=0;i<4;i++){
+                if (cobrinha[i].posicao.x < 40.0f){ 
+                    cobrinha[i].posicao.x = 40.0f;
                 }
-                if (cobrinha.posicao.x > (float)larguraTela - 40.0f) {
-                    cobrinha.posicao.x = (float)larguraTela - 40.0f;
+                if (cobrinha[i].posicao.x > (float)largura_tela - 40.0f) {
+                    cobrinha[i].posicao.x = (float)largura_tela - 40.0f;
                 }
-                if (cobrinha.posicao.y < 40.0f){
-                    cobrinha.posicao.y = 40.0f;}
-                if (cobrinha.posicao.y > (float)alturaTela - 40.0f) {
-                    cobrinha.posicao.y = (float)alturaTela - 40.0f;
+                if (cobrinha[i].posicao.y < 40.0f){
+                    cobrinha[i].posicao.y = 40.0f;}
+                if (cobrinha[i].posicao.y > (float)altura_tela - 40.0f) {
+                    cobrinha[i].posicao.y = (float)altura_tela - 40.0f;
                 }
+            }
             }
         }
 
