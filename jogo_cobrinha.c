@@ -28,7 +28,9 @@ int main(void){
     const float raio_cobrinha = 40.0f;
 
 
-    InitWindow(larguraTela, alturaTela, "Jogo Da Cobrinha"); //abre a tela
+    InitWindow(largura_tela, altura_tela, "Jogo Da Cobrinha");
+    Texture2D fundo = LoadTexture("fundo.png");
+
     SetTargetFPS(60);
 
     Cobra cobrinha[4];
