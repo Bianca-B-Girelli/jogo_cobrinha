@@ -50,6 +50,15 @@ int main(void) {
         cobrinha[i].velocidade = 5.0f; // Velocidade de movimento por frame
     }
 
+        typedef struct {
+        int x;
+        int y;
+    } Ponto;
+
+    Ponto corpo[100]; // Tamanho máximo da cobra
+    int tamanhoCobra = 3;
+    int direcaoX = 1, direcaoY = 0; // Começa movendo para a direita
+
     // ---------------------------------------------------------------------------------
     // 2. LAÇO PRINCIPAL DO JOGO (GAME LOOP)
     // ---------------------------------------------------------------------------------
@@ -107,11 +116,25 @@ int main(void) {
                 // Seguidor simples para o corpo (segmentos 1, 2 e 3 seguem o anterior)
                 // Nota: para uma movimentação de cobra real em grid, o sistema precisaria de um histórico de posições.
                 // Mas por enquanto, este laço mantém o corpo junto ao movimento básico:
-                for (int i = 3; i > 0; i--) {
+            
+                
+                // 1. Move o corpo (da cauda até o pescoço)
+                for (int i = tamanhoCobra - 1; i > 0; i--) {
+                    corpo[i] = corpo[i - 1];
+                }
+                
+                // 2. Move a cabeça para a nova direção
+                corpo[0].x += direcaoX;
+                corpo[0].y += direcaoY;
+            
+            
+                /*for (int i = 3; i > 0; i--) {
                     // Interpolação simples para os segmentos seguirem o da frente de forma suave
                     cobrinha[i].posicao.x += (cobrinha[i-1].posicao.x - cobrinha[i].posicao.x) * 0.15f;
                     cobrinha[i].posicao.y += ((cobrinha[i-1].posicao.y + 40.0f) - cobrinha[i].posicao.y) * 0.15f;
                 }
+                */
+
 
                 // SISTEMA DE COLISÃO BÁSICO (Bordas de Tela aplicadas à cabeça)
                 if (cobrinha[0].posicao.x < 0) {
@@ -183,7 +206,7 @@ int main(void) {
                 // Texto de dica de retorno enquanto joga
                 DrawText("Pressione ESC para voltar ao Menu", 20, 20, 20, LIGHTGRAY);
                 break;
-            }
+            } 
         }
 
         EndDrawing();
