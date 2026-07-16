@@ -35,8 +35,9 @@ int main(void) {
     SetExitKey(KEY_P);
 
     // Carrega a textura de fundo
-    // Certifique-se de ter a imagem "fundo.png" na mesma pasta do executável
     Texture2D fundo = LoadTexture("imagens/fundo.png");
+    Texture2D fundo2 = LoadTexture("imagens/fundo2.png");
+
 
     SetTargetFPS(60);
 
@@ -135,33 +136,37 @@ int main(void) {
         BeginDrawing();
         ClearBackground(BLACK); // Caso a imagem de fundo falhe, a tela fica preta
 
-        // Desenha a imagem de fundo se ela foi carregada com sucesso
-        if (fundo.id > 0) {
-            DrawTexture(fundo, 0, 0, WHITE);
-        }
+    
 
         switch (estadoAtual) {
             case MENU: {
+                if (fundo.id > 0) {
+                    DrawTexture(fundo2, 0, 0, WHITE);
+                }
                 // Desenho do Menu Principal
                 const char* title = "JOGO DA COBRINHA";
-                int titleWidth = MeasureText(title, 44);
-                DrawText(title, largura_tela / 2 - titleWidth / 2, 150, 44, GREEN);
+                int titleWidth = MeasureText(title, 80);
+                DrawText(title, largura_tela / 2 - titleWidth / 2, 200, 80, BLACK);
 
                 if (opcaoSelecionada == 0) {
-                    DrawText("> JOGAR <", largura_tela / 2 - MeasureText("> JOGAR <", 24) / 2, 320, 24, RAYWHITE);
-                    DrawText("FECHAR", largura_tela / 2 - MeasureText("FECHAR", 20) / 2, 380, 20, GRAY);
+                    DrawText("> JOGAR <", largura_tela / 2.3 - MeasureText("> JOGAR <", 24) / 2, 320, 44, RAYWHITE);
+                    DrawText("FECHAR", largura_tela / 2.3 - MeasureText("FECHAR", 20) / 2, 380, 44, BLACK);
                 } else {
-                    DrawText("JOGAR", largura_tela / 2 - MeasureText("JOGAR", 20) / 2, 320, 20, GRAY);
-                    DrawText("> FECHAR <", largura_tela / 2 - MeasureText("> FECHAR <", 24) / 2, 380, 24, RAYWHITE);
+                    DrawText("JOGAR", largura_tela / 2.25 - MeasureText("JOGAR", 20) / 2, 320, 44, BLACK);
+                    DrawText("> FECHAR <", largura_tela / 2.35 - MeasureText("> FECHAR <", 24) / 2, 380, 44, RAYWHITE);
                 }
 
                 const char* footer = "Navegue com W/S ou Setas e selecione com Enter";
                 int footerWidth = MeasureText(footer, 14);
-                DrawText(footer, largura_tela / 2 - footerWidth / 2, 520, 14, DARKGRAY);
+                DrawText(footer, largura_tela / 2.6 - footerWidth / 2, 600, 24, BLACK);
                 break;
             }
 
             case JOGANDO: {
+
+                if (fundo.id > 0) {
+                    DrawTexture(fundo, 0, 0, WHITE);
+                }
                 // Desenha todos os segmentos da cobrinha (corpo e cabeça)
                 // O loop desenha de trás para frente para a cabeça (índice 0) ficar por cima
                 for (int i = 3; i >= 0; i--) {
