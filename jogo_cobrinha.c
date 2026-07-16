@@ -36,7 +36,7 @@ int main(void) {
 
     // Carrega a textura de fundo
     // Certifique-se de ter a imagem "fundo.png" na mesma pasta do executável
-    Texture2D fundo = LoadTexture("fundo.png");
+    Texture2D fundo = LoadTexture("imagens/fundo.png");
 
     SetTargetFPS(60);
 
