@@ -7,9 +7,11 @@
 // 1. DEFINIÇÃO DAS ESTRUTURAS
 // ---------------------------------------------------------------------------------
 
+
 typedef enum EstadoJogo {
     MENU,       // Estado que exibe o menu principal e opções do usuário
-    JOGANDO     // Estado ativo de simulação com a cobrinha
+    JOGANDO,     // Estado ativo de simulação com a cobrinha
+    FIM
 } EstadoJogo;
 
 
@@ -44,9 +46,13 @@ int main(void) {
     // Carrega a textura de fundo
     Texture2D fundo = LoadTexture("imagens/fundo.png");
     Texture2D fundo2 = LoadTexture("imagens/fundo2.png");
+    Texture2D fundoGameOver = LoadTexture("imagens/gameover.png");
+
+
 
     //Frames por segundo
     SetTargetFPS(60);
+
 
     // Inicialização dos 4 segmentos da cobrinha
     Cobra cobrinha[4];
@@ -109,50 +115,49 @@ int main(void) {
                 }
                
                 // 1. Captação de Entrada (muda a direção sem permitir inverter 180º)
-		        if (cobrinha[0].viva) { 
-                    if ((IsKeyPressed(KEY_LEFT) || IsKeyPressed(KEY_A)) && direcao.x == 0) {
-                        direcao = (Vector2){ -1, 0 };
-                    }
-                    if ((IsKeyPressed(KEY_RIGHT) || IsKeyPressed(KEY_D)) && direcao.x == 0) {
-                        direcao = (Vector2){ 1, 0 };
-                    }
-                    if ((IsKeyPressed(KEY_UP) || IsKeyPressed(KEY_W)) && direcao.y == 0) {
-                        direcao = (Vector2){ 0, -1 };
-                    }
-                    if ((IsKeyPressed(KEY_DOWN) || IsKeyPressed(KEY_S)) && direcao.y == 0) {
-                        direcao = (Vector2){ 0, 1 };
-                    }
+		    if (cobrinha[0].viva) { 
+                if ((IsKeyPressed(KEY_LEFT) || IsKeyPressed(KEY_A)) && direcao.x == 0) {
+                    direcao = (Vector2){ -1, 0 };
+                }
+                if ((IsKeyPressed(KEY_RIGHT) || IsKeyPressed(KEY_D)) && direcao.x == 0) {
+                    direcao = (Vector2){ 1, 0 };
+                }
+                if ((IsKeyPressed(KEY_UP) || IsKeyPressed(KEY_W)) && direcao.y == 0) {
+                    direcao = (Vector2){ 0, -1 };
+                }
+                if ((IsKeyPressed(KEY_DOWN) || IsKeyPressed(KEY_S)) && direcao.y == 0) {
+                    direcao = (Vector2){ 0, 1 };
+                }
 
 
-                    // 2. Atualização por Intervalo de Tempo (Passo a Passo)
-                    contadorTempo += GetFrameTime();
-                    if (contadorTempo >= tempoPasso) {
-                        contadorTempo = 0.0f; // Reseta o relógio
+                // 2. Atualização por Intervalo de Tempo (Passo a Passo)
+                contadorTempo += GetFrameTime();
+                if (contadorTempo >= tempoPasso) {
+                    contadorTempo = 0.0f; // Reseta o relógio
 
 
-                        // Move o corpo: cada segmento pega a posição exata do segmento à sua frente
-                        for (int i = 3; i > 0; i--) {
-                            cobrinha[i].posicao = cobrinha[i - 1].posicao;
-                        }
-
-
-                        // Move a cabeça de acordo com a direção atual
-                        cobrinha[0].posicao.x += direcao.x * raio_cobrinha;
-                        cobrinha[0].posicao.y += direcao.y * raio_cobrinha;
+                    // Move o corpo: cada segmento pega a posição exata do segmento à sua frente
+                    for (int i = 3; i > 0; i--) {
+                        cobrinha[i].posicao = cobrinha[i - 1].posicao;
                     }
 
 
-                    // SISTEMA DE COLISÃO REFORMADO USANDO BOOL PARA VERIFICAR SE ELA ESTA VIVA (Bordas de Tela aplicadas à cabeça)
-                    if (cobrinha[0].posicao.x < 0 ||
-                        cobrinha[0].posicao.x > (float)largura_tela - raio_cobrinha ||
-                        cobrinha[0].posicao.y < 0 || 
-                        cobrinha[0].posicao.y > (float)altura_tela - raio_cobrinha) 
-                        {cobrinha[0].viva = false;}
-                }else{ estadoAtual = MENU; 
-                       cobrinha[0].viva = true;
-                    } 
-                                            
-                break;
+                    // Move a cabeça de acordo com a direção atual
+                    cobrinha[0].posicao.x += direcao.x * raio_cobrinha;
+                    cobrinha[0].posicao.y += direcao.y * raio_cobrinha;
+                }
+
+
+                // SISTEMA DE COLISÃO REFORMADO USANDO BOOL PARA VERIFICAR SE ELA ESTA VIVA (Bordas de Tela aplicadas à cabeça)
+            if (cobrinha[0].posicao.x < 0 ||
+ 		        cobrinha[0].posicao.x > (float)largura_tela - raio_cobrinha ||
+                cobrinha[0].posicao.y < 0 || 
+                cobrinha[0].posicao.y > (float)altura_tela - raio_cobrinha) { 	 
+                cobrinha[0].viva = false;
+                estadoAtual = FIM;}
+}
+                         
+               break;
             }
         }
 
@@ -162,6 +167,9 @@ int main(void) {
         // =============================================================================
         BeginDrawing();
         ClearBackground(BLACK); // Caso a imagem de fundo falhe, a tela fica preta
+
+
+   
 
 
         switch (estadoAtual) {
@@ -175,7 +183,6 @@ int main(void) {
                 int titleWidth = MeasureText(title, 80);
                 DrawText(title, largura_tela / 2 - titleWidth / 2, 200, 80, BLACK);
 
-                // Desenha as opçãoes no menu
                 if (opcaoSelecionada == 0) {
                     DrawText("> JOGAR <", largura_tela / 2.3 - MeasureText("> JOGAR <", 24) / 2, 320, 44, RAYWHITE);
                     DrawText("FECHAR", largura_tela / 2.3 - MeasureText("FECHAR", 20) / 2, 380, 44, BLACK);
@@ -184,7 +191,6 @@ int main(void) {
                     DrawText("> FECHAR <", largura_tela / 2.35 - MeasureText("> FECHAR <", 24) / 2, 380, 44, RAYWHITE);
                 }
 
-                //Desenha o footer com as instruções
                 const char* footer = "Navegue com W/S ou Setas e selecione com Enter";
                 int footerWidth = MeasureText(footer, 14);
                 DrawText(footer, largura_tela / 2.6 - footerWidth / 2, 600, 24, BLACK);
@@ -194,7 +200,6 @@ int main(void) {
 
             case JOGANDO: {
 
-                // Carrega a imagem do jogo
                 if (fundo.id > 0) {
                     DrawTexture(fundo, 0, 0, WHITE);
                 }
@@ -215,6 +220,27 @@ int main(void) {
                 DrawText("Pressione ESC para voltar ao Menu", 20, 20, 20, LIGHTGRAY);
                 break;
             }
+
+            case FIM: {
+                DrawTexture(fundoGameOver, 0, 0, WHITE);
+
+                const char* title = "GAME OVER";
+                DrawText(title,
+                        largura_tela / 2 - MeasureText(title, 60) / 2,
+                        100, 60, DARKPURPLE);
+
+                DrawText("Pressione ENTER para voltar ao menu",
+                        largura_tela / 2 - MeasureText("Pressione ENTER para voltar ao menu", 24) / 2,
+                        500, 24, BLACK);
+
+                if (IsKeyPressed(KEY_ENTER)) {
+                    cobrinha[0].viva = true;
+                    estadoAtual = MENU;
+                }
+
+                break;
+
+            }
         }
 
 
@@ -224,9 +250,9 @@ int main(void) {
     // Descarrega a textura e fecha a janela de forma segura
     UnloadTexture(fundo);
     UnloadTexture(fundo2);
+    UnloadTexture(fundoGameOver);
     CloseWindow();
    
     return 0;
 }
-
 

@@ -1,4 +1,4 @@
-conan profile detect --force
+
 export CMAKE_POLICY_VERSION_MINIMUM=3.5 
 conan install . --output-folder=build --build=missing
 cd build
