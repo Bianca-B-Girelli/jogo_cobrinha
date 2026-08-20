@@ -63,6 +63,65 @@ void encerrar_jogo(Cobra *cobrinha, int largura_tela, int altura_tela, float rai
     }
 }
 
+void desenhar_menu(Texture2D fundo, int opcaoSelecionada, int largura_tela) {
+    // Desenha a imagem de fundo do menu
+    if (fundo.id > 0) {
+        DrawTexture(fundo, 0, 0, WHITE);
+    }
+
+    // Título
+    const char* title = "JOGO DA COBRINHA";
+    int titleWidth = MeasureText(title, 80);
+    DrawText(title, largura_tela / 2 - titleWidth / 2, 200, 80, BLACK);
+
+    // Opções do menu
+    if (opcaoSelecionada == 0) {
+        DrawText("> JOGAR <", largura_tela / 2.3 - MeasureText("> JOGAR <", 24) / 2, 320, 44, RAYWHITE);
+        DrawText("FECHAR", largura_tela / 2.3 - MeasureText("FECHAR", 20) / 2, 380, 44, BLACK);
+    } else {
+        DrawText("JOGAR", largura_tela / 2.25 - MeasureText("JOGAR", 20) / 2, 320, 44, BLACK);
+        DrawText("> FECHAR <", largura_tela / 2.35 - MeasureText("> FECHAR <", 24) / 2, 380, 44, RAYWHITE);
+    }
+
+    // Instrução no rodapé
+    const char* footer = "Navegue com W/S ou Setas e selecione com Enter";
+    int footerWidth = MeasureText(footer, 14);
+    DrawText(footer, largura_tela / 2.6 - footerWidth / 2, 600, 24, BLACK);
+}
+
+void desenhar_game_over(Texture2D fundoGameOver, int largura_tela, int altura_tela) {
+    // Fundo da tela de Game Over
+    if (fundoGameOver.id > 0) {
+        DrawTexture(fundoGameOver, 0, 0, WHITE);
+    }
+
+    // Título "GAME OVER"
+    const char* gameOverText = "GAME OVER";
+    int tamanhoFonte = 80;
+    int larguraTexto = MeasureText(gameOverText, tamanhoFonte);
+
+    DrawText(
+        gameOverText,
+        (largura_tela - larguraTexto) / 2,
+        (altura_tela - tamanhoFonte) / 2,
+        tamanhoFonte,
+        RED
+    );
+
+    // Mensagem de instrução
+    const char* mensagem = "Pressione ENTER para voltar ao menu";
+    int tamanhoMensagem = 24;
+    int larguraMensagem = MeasureText(mensagem, tamanhoMensagem);
+
+    DrawText(
+        mensagem,
+        (largura_tela - larguraMensagem) / 2,
+        (altura_tela - tamanhoFonte) / 2 + 100,
+        tamanhoMensagem,
+        BLACK
+    );
+}
+
 int main(void) {
 
     // Configuração da janela
@@ -289,90 +348,9 @@ int main(void) {
             // -------------------------------------------------------------------------
 
             case MENU: {
-
-                // Carrega o fundo do menu
-                if (fundo2.id > 0) {
-                    DrawTexture(fundo2, 0, 0, WHITE);
-                }
-
-
-                // Título
-                const char* title = "JOGO DA COBRINHA";
-
-                int titleWidth =
-                    MeasureText(title, 80);
-
-                DrawText(
-                    title,
-                    largura_tela / 2 - titleWidth / 2,
-                    200,
-                    80,
-                    BLACK
-                );
-
-
-                // Opções do menu
-                if (opcaoSelecionada == 0) {
-
-                    DrawText(
-                        "> JOGAR <",
-                        largura_tela / 2.3 -
-                        MeasureText("> JOGAR <", 24) / 2,
-                        320,
-                        44,
-                        RAYWHITE
-                    );
-
-                    DrawText(
-                        "FECHAR",
-                        largura_tela / 2.3 -
-                        MeasureText("FECHAR", 20) / 2,
-                        380,
-                        44,
-                        BLACK
-                    );
-
-                } else {
-
-                    DrawText(
-                        "JOGAR",
-                        largura_tela / 2.25 -
-                        MeasureText("JOGAR", 20) / 2,
-                        320,
-                        44,
-                        BLACK
-                    );
-
-                    DrawText(
-                        "> FECHAR <",
-                        largura_tela / 2.35 -
-                        MeasureText("> FECHAR <", 24) / 2,
-                        380,
-                        44,
-                        RAYWHITE
-                    );
-                }
-
-
-                // Footer
-                const char* footer =
-                    "Navegue com W/S ou Setas e selecione com Enter";
-
-                int footerWidth =
-                    MeasureText(footer, 14);
-
-                DrawText(
-                    footer,
-                    largura_tela / 2.6 -
-                    footerWidth / 2,
-                    600,
-                    24,
-                    BLACK
-                );
-
+                desenhar_menu(fundo2, opcaoSelecionada, largura_tela);
                 break;
             }
-
 
             // -------------------------------------------------------------------------
             // TELA DO JOGO
@@ -426,68 +404,10 @@ int main(void) {
 
             case FIM: {
 
-                // Desenha a imagem de Game Over
-                if (fundoGameOver.id > 0) {
-                    DrawTexture(
-                        fundoGameOver,
-                        0,
-                        0,
-                        WHITE
-                    );
-                }
-
-
-                // -------------------------------------------------------------
-                // GAME OVER CENTRALIZADO
-                // -------------------------------------------------------------
-
-                const char* gameOverText = "GAME OVER";
-
-                int tamanhoFonte = 80;
-
-                int larguraTexto =
-                    MeasureText(
-                        gameOverText,
-                        tamanhoFonte
-                    );
-
-
-                DrawText(
-                    gameOverText,
-                    (largura_tela - larguraTexto) / 2,
-                    (altura_tela - tamanhoFonte) / 2,
-                    tamanhoFonte,
-                    RED
-                );
-
-
-                // -------------------------------------------------------------
-                // TEXTO ABAIXO DO GAME OVER
-                // -------------------------------------------------------------
-
-                const char* mensagem =
-                    "Pressione ENTER para voltar ao menu";
-
-                int tamanhoMensagem = 24;
-
-                int larguraMensagem =
-                    MeasureText(
-                        mensagem,
-                        tamanhoMensagem
-                    );
-
-
-                DrawText(
-                    mensagem,
-                    (largura_tela - larguraMensagem) / 2,
-                    (altura_tela - tamanhoFonte) / 2 + 100,
-                    tamanhoMensagem,
-                    BLACK
-                );
-
-
+                desenhar_game_over(fundoGameOver, largura_tela, altura_tela);
                 break;
             }
+            
         }
 
 
