@@ -22,6 +22,46 @@ typedef struct Cobra {
     bool viva;
 } Cobra;
 
+void mover_cobrinha(Cobra *cobrinha, float *contadorTempo, float tempoPasso, float raio_cobrinha, Vector2 direcao){
+    *contadorTempo += GetFrameTime();
+
+    if (*contadorTempo >= tempoPasso) {
+
+        *contadorTempo -= tempoPasso;
+
+
+        // Move o corpo
+        for (int i = 3; i > 0; i--) {
+            cobrinha[i].posicao =
+                cobrinha[i - 1].posicao;
+        }
+
+
+        // Move a cabeça
+        cobrinha[0].posicao.x +=
+            direcao.x * raio_cobrinha;
+
+        cobrinha[0].posicao.y +=
+            direcao.y * raio_cobrinha;
+    }
+}
+
+void encerrar_jogo(Cobra *cobrinha, int largura_tela, int altura_tela, float raio_cobrinha, EstadoJogo *estadoAtual){
+    if (cobrinha[0].posicao.x < 0 ||
+        cobrinha[0].posicao.x >
+        (float)largura_tela - raio_cobrinha ||
+
+        cobrinha[0].posicao.y < 0 ||
+        cobrinha[0].posicao.y >
+        (float)altura_tela - raio_cobrinha) {
+
+        // Cobra morreu
+        cobrinha[0].viva = false;
+
+        // Vai para a tela de Game Over
+        *estadoAtual = FIM;
+    }
+}
 
 int main(void) {
 
@@ -201,47 +241,13 @@ int main(void) {
                     // MOVIMENTO DA COBRA
                     // -------------------------------------------------------------
 
-                    contadorTempo += GetFrameTime();
-
-                    if (contadorTempo >= tempoPasso) {
-
-                        contadorTempo -= tempoPasso;
-
-
-                        // Move o corpo
-                        for (int i = 3; i > 0; i--) {
-                            cobrinha[i].posicao =
-                                cobrinha[i - 1].posicao;
-                        }
-
-
-                        // Move a cabeça
-                        cobrinha[0].posicao.x +=
-                            direcao.x * raio_cobrinha;
-
-                        cobrinha[0].posicao.y +=
-                            direcao.y * raio_cobrinha;
-                    }
-
+                    mover_cobrinha(cobrinha, &contadorTempo, tempoPasso, raio_cobrinha, direcao);
 
                     // -------------------------------------------------------------
                     // COLISÃO COM AS BORDAS
                     // -------------------------------------------------------------
+                    encerrar_jogo(cobrinha, largura_tela, altura_tela, raio_cobrinha, &estadoAtual);
 
-                    if (cobrinha[0].posicao.x < 0 ||
-                        cobrinha[0].posicao.x >
-                        (float)largura_tela - raio_cobrinha ||
-
-                        cobrinha[0].posicao.y < 0 ||
-                        cobrinha[0].posicao.y >
-                        (float)altura_tela - raio_cobrinha) {
-
-                        // Cobra morreu
-                        cobrinha[0].viva = false;
-
-                        // Vai para a tela de Game Over
-                        estadoAtual = FIM;
-                    }
                 }
 
                 break;
