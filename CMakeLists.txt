@@ -3,7 +3,7 @@ project(jogo_cobrinha)
 
 find_package(raylib REQUIRED)
 
-add_executable(${PROJECT_NAME} jogo_cobrinha.c )
+add_executable(${PROJECT_NAME} jogo_cobrinha.c cobra.c )
 target_link_libraries(${PROJECT_NAME} PRIVATE raylib)
 
 add_custom_command(

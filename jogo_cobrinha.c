@@ -1,7 +1,7 @@
 #include "raylib.h"
 #include <stdbool.h>
-#include <stdio.h>
-#include "cobra.c"
+#include <stdio.h> 
+#include "cobra.h"
 
 
 // ---------------------------------------------------------------------------------
@@ -15,51 +15,56 @@ typedef enum EstadoJogo {
 } EstadoJogo;
 
 
-// Estruturação da cobrinha
-typedef struct Cobra {
-    Vector2 posicao;
-    float velocidade;
-    Color cor;
-    bool viva;
-} Cobra;
 
-void mover_cobrinha(Cobra *cobrinha, float *contadorTempo, float tempoPasso, float raio_cobrinha, Vector2 direcao){
+void mover_cobrinha(Cabecalho *cobra, float *contadorTempo, float tempoPasso, float raio_cobrinha, Vector2 direcao) {
     *contadorTempo += GetFrameTime();
 
     if (*contadorTempo >= tempoPasso) {
 
         *contadorTempo -= tempoPasso;
 
+        if (cobra == NULL || cobra->inicio == NULL) return;
 
-        // Move o corpo
-        for (int i = 3; i > 0; i--) {
-            cobrinha[i].posicao =
-                cobrinha[i - 1].posicao;
+        // Atualiza a posição de cada nó do fim para o início (o nó assume a posição do anterior)
+        // atualizar os valores das posições de trás para frente.
+        int len = cobra->len;
+        if (len > 1) {
+            // Cria um array temporário com as posições atuais para reatribuir aos nós
+            Vector2 posicoes[len];
+            Node *atual = cobra->inicio;
+            int idx = 0;
+            while (atual != NULL) {
+                posicoes[idx++] = atual->posicao;
+                atual = atual->next;
+            }
+
+            // Desloca as posições do corpo
+            atual = cobra->inicio->next;
+            idx = 0;
+            while (atual != NULL) {
+                atual->posicao = posicoes[idx++];
+                atual = atual->next;
+            }
         }
 
-
-        // Move a cabeça
-        cobrinha[0].posicao.x +=
-            direcao.x * raio_cobrinha;
-
-        cobrinha[0].posicao.y +=
-            direcao.y * raio_cobrinha;
+        // Atualiza a posição da cabeça (primeiro nó)
+        cobra->inicio->posicao.x += direcao.x * raio_cobrinha;
+        cobra->inicio->posicao.y += direcao.y * raio_cobrinha;
     }
 }
 
-void encerrar_jogo(Cobra *cobrinha, int largura_tela, int altura_tela, float raio_cobrinha, EstadoJogo *estadoAtual){
-    if (cobrinha[0].posicao.x < 0 ||
-        cobrinha[0].posicao.x >
-        (float)largura_tela - raio_cobrinha ||
 
-        cobrinha[0].posicao.y < 0 ||
-        cobrinha[0].posicao.y >
-        (float)altura_tela - raio_cobrinha) {
+void encerrar_jogo(Cabecalho *cobra, int largura_tela, int altura_tela, float raio_cobrinha, EstadoJogo *estadoAtual, bool *viva) {
+    if (cobra == NULL || cobra->inicio == NULL) return;
 
-        // Cobra morreu
-        cobrinha[0].viva = false;
+    Vector2 cabeca = cobra->inicio->posicao;
 
-        // Vai para a tela de Game Over
+    if (cabeca.x < 0 ||
+        cabeca.x > (float)largura_tela - raio_cobrinha ||
+        cabeca.y < 0 ||
+        cabeca.y > (float)altura_tela - raio_cobrinha) {
+
+        *viva = false;
         *estadoAtual = FIM;
     }
 }
@@ -136,6 +141,8 @@ int main(void) {
     bool fecharJogo = false;
     int opcaoSelecionada = 0; // 0 = Jogar, 1 = Fechar
 
+    // ALTERAÇÃO: Adicionada a variável cobraViva para controlar o estado da lista
+    bool cobraViva = true;
 
     InitWindow(largura_tela, altura_tela, "Jogo Da Cobrinha");
 
@@ -160,9 +167,8 @@ int main(void) {
     // INICIALIZAÇÃO DA COBRA
     // ---------------------------------------------------------------------------------
 
-    Cobra cobrinha[4];
-
-    cobrinha[0].viva = true;
+    // Inicialização do ponteiro da cobra gerenciado pela lista encadeada
+    Cabecalho *cobra = NULL;
 
 
     // Direção inicial da cobra
@@ -205,35 +211,22 @@ int main(void) {
 
                 // Processamento de seleção
                 if (IsKeyPressed(KEY_ENTER)) {
-
-                    // Jogar
                     if (opcaoSelecionada == 0) {
-
-                        // Reseta a cobra
-                        for (int i = 0; i < 4; i++) {
-
-                            cobrinha[i].posicao.x = 600;
-                            cobrinha[i].posicao.y =
-                                400 + (raio_cobrinha * i);
-
-                            cobrinha[i].cor = BLUE;
-                            cobrinha[i].viva = true;
+                        // Limpa a cobra anterior se existir
+                        if (cobra != NULL) {
+                            destruir_cobra(cobra);
                         }
 
+                        // ALTERAÇÃO: Cria a cobra apenas com a cabeça (1 nó)
+                        cobra = criar_cobra();
+                        Vector2 posInicial = { 600.0f, 400.0f };
+                        inserir_fim(cobra, posInicial, SKYBLUE);
 
-                        // Reseta a direção
+                        cobraViva = true;
                         direcao = (Vector2){ 0, -1 };
-
-                        // Reseta o contador
                         contadorTempo = 0.0f;
-
-                        // Começa o jogo
                         estadoAtual = JOGANDO;
-                    }
-
-
-                    // Fechar
-                    else if (opcaoSelecionada == 1) {
+                    } else if (opcaoSelecionada == 1) {
                         fecharJogo = true;
                     }
                 }
@@ -254,9 +247,8 @@ int main(void) {
                 }
 
 
-                // Só movimenta se a cobra estiver viva
-                if (cobrinha[0].viva) {
-
+                // ALTERAÇÃO: Verifica se a cobra existe e está viva usando cobraViva
+                if (cobraViva && cobra != NULL) {
                     // -------------------------------------------------------------
                     // CAPTAÇÃO DE ENTRADA
                     // -------------------------------------------------------------
@@ -296,18 +288,44 @@ int main(void) {
                         direcao = (Vector2){ 0, 1 };
                     }
 
+                    // ALTERAÇÃO: Tecla C para aumentar a cobra (inserir nó no fim)
+                    if (IsKeyPressed(KEY_C)) {
+                        if (cobra != NULL && cobra->fim != NULL) {
+                            Vector2 novaPos = { 
+                                cobra->fim->posicao.x - (direcao.x * raio_cobrinha), 
+                                cobra->fim->posicao.y - (direcao.y * raio_cobrinha) 
+                            };
+                            inserir_fim(cobra, novaPos, BLUE);
+                        }
+                    }
+
+
+
+                    // ALTERAÇÃO: Tecla ESPAÇO para apagar a lista e reiniciar só com a cabeça
+                    if (IsKeyPressed(KEY_SPACE)) {
+
+                        if (cobra != NULL) {
+                            destruir_cobra(cobra);
+                        }
+
+                        cobra = criar_cobra();
+                        Vector2 posInicial = { 600.0f, 400.0f };
+                        inserir_fim(cobra, posInicial, SKYBLUE);
+                    }
 
                     // -------------------------------------------------------------
                     // MOVIMENTO DA COBRA
                     // -------------------------------------------------------------
 
-                    mover_cobrinha(cobrinha, &contadorTempo, tempoPasso, raio_cobrinha, direcao);
+                   // ALTERAÇÃO: Passa o ponteiro da lista `cobra`
+                    mover_cobrinha(cobra, &contadorTempo, tempoPasso, raio_cobrinha, direcao);
 
                     // -------------------------------------------------------------
                     // COLISÃO COM AS BORDAS
                     // -------------------------------------------------------------
-                    encerrar_jogo(cobrinha, largura_tela, altura_tela, raio_cobrinha, &estadoAtual);
-
+                    
+                    // ALTERAÇÃO: Passa os ponteiros corretos da lista e da flag cobraViva
+                    encerrar_jogo(cobra, largura_tela, altura_tela, raio_cobrinha, &estadoAtual, &cobraViva);
                 }
 
                 break;
@@ -323,7 +341,7 @@ int main(void) {
                 // Pressiona ENTER para voltar ao menu
                 if (IsKeyPressed(KEY_ENTER)) {
 
-                    cobrinha[0].viva = true;
+                    cobraViva = true; //Removi 'cobrinha[0].viva = true' para usar 'cobraViva'
 
                     estadoAtual = MENU;
                 }
@@ -365,24 +383,20 @@ int main(void) {
                 }
 
 
-                // Desenha os segmentos da cobra
-                for (int i = 3; i >= 0; i--) {
+                // ALTERAÇÃO: Desenha os nós percorrendo a lista encadeada 
+                if (cobra != NULL) {
+                    Node *atual = cobra->inicio;
+                    while (atual != NULL) {
+                        // Define cor diferente para a cabeça (primeiro nó)
+                        Color corSegmento = (atual == cobra->inicio) ? SKYBLUE : atual->cor;
 
-                    // Cabeça com cor diferente
-                    Color corSegmento =
-                        (i == 0) ?
-                        SKYBLUE :
-                        cobrinha[i].cor;
-
-
-                    DrawRectangleV(
-                        cobrinha[i].posicao,
-                        (Vector2){
-                            raio_cobrinha,
-                            raio_cobrinha
-                        },
-                        corSegmento
-                    );
+                        DrawRectangleV(
+                            atual->posicao,
+                            (Vector2){ raio_cobrinha, raio_cobrinha },
+                            corSegmento
+                        );
+                        atual = atual->next;
+                    }
                 }
 
 
@@ -394,6 +408,9 @@ int main(void) {
                     20,
                     LIGHTGRAY
                 );
+
+                // ALTERAÇÃO: Dicas das teclas de teste adicionadas na tela
+                DrawText("Tecla C: Aumenta a cobra | ESPACO: Reinicia a lista", 20, 50, 20, YELLOW);
 
                 break;
             }
@@ -419,6 +436,12 @@ int main(void) {
     // ---------------------------------------------------------------------------------
     // FINALIZAÇÃO
     // ---------------------------------------------------------------------------------
+
+    // ALTERAÇÃO: Limpeza de memória da lista encadeada ao fechar o jogo
+    if (cobra != NULL) {
+        destruir_cobra(cobra);
+    }
+
 
     UnloadTexture(fundo);
     UnloadTexture(fundo2);
