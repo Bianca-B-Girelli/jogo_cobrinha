@@ -406,11 +406,11 @@ int main(void) {
                     20,
                     20,
                     20,
-                    LIGHTGRAY
+                    BLACK
                 );
 
                 // ALTERAÇÃO: Dicas das teclas de teste adicionadas na tela
-                DrawText("Tecla C: Aumenta a cobra | ESPACO: Reinicia a lista", 20, 50, 20, YELLOW);
+                DrawText("Tecla C: Aumenta a cobra | ESPACO: Reinicia a lista", 20, 50, 20, BLACK);
 
                 break;
             }
