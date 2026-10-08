@@ -66,6 +66,22 @@ void encerrar_jogo(Cabecalho *cobra, int largura_tela, int altura_tela, float ra
 
         *viva = false;
         *estadoAtual = FIM;
+        return;
+    }
+
+    //Colisão com o corpo da cobra a partir do tamanho 4(ela não consegue se matar antes desse tamanho)
+    if (cobra->len >= 4) {
+        Node *atual = cobra->inicio->next->next->next; 
+        //O atual serve para verificar a partir da quarta posição, sem necessitar contar o início todas as vezes
+        while (atual != NULL) {
+            //checa se a cabeça está colidindo com corpo
+            if (cabeca.x == atual->posicao.x && cabeca.y == atual->posicao.y) {
+                *viva = false;
+                *estadoAtual = FIM;
+                break; 
+            }
+            atual = atual->next;
+        }
     }
 }
 
