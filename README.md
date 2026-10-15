@@ -1,5 +1,5 @@
 # Jogo Cobrinha Legal
-<img width="500" height="322" alt="Image" src="https://github.com/user-attachments/assets/d8dc152b-6299-4b98-8595-86087742be12" />
+<img width="400" height="50" alt="Image" src="https://github.com/user-attachments/assets/3f61d6b1-5f4e-4ca5-91a4-fd2b5aa3dc22" />
 
 ### Esse Jogo foi desenvolvido para fins de aprendizado por Bianca, Laura e Paloma
 
