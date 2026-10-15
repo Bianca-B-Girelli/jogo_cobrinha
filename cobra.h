@@ -20,6 +20,13 @@ typedef struct {
     int len;
 } Cabecalho;
 
+//3. A estrutura Maca representa a maçã que a cobrinha deve comer
+typedef struct {
+    Vector2 posicao;
+    bool ativa;
+    int tipo; // 1 = Normal (aumenta 1), 2 = Dourada (aumenta 3)
+} Maca;
+
 // Inicializa a estrutura do cabeçalho
 Cabecalho* criar_cobra(void);
 
@@ -28,5 +35,8 @@ bool inserir_fim(Cabecalho *cobra, Vector2 posicao, Color cor);
 
 // Libera toda a memória alocada para os nós e para o cabeçalho
 void destruir_cobra(Cabecalho *cobra);
+
+
+void gerar_maca(Maca *maca, Cabecalho *cobra, int largura_tela, int altura_tela, float raio);
 
 #endif // COBRA_H

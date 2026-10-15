@@ -52,3 +52,43 @@ void destruir_cobra(Cabecalho *cobra) {
     cobra->len = 0;
     free(cobra); // Libera a estrutura do cabeçalho
 }
+
+void gerar_maca(Maca *maca, Cabecalho *cobra, int largura_tela, int altura_tela, float raio) {
+    bool posicao_valida = false; // Variável de controle para saber se a posição sorteada é segura (não está em cima da cobra)
+
+    // Laço que continua rodando até encontrar uma posição totalmente livre na tela
+    while (!posicao_valida) {
+
+        // Calcula quantas colunas e linhas cabem na tela com base no tamanho do bloco (raio)
+        int max_x = (largura_tela / (int)raio);
+        int max_y = (altura_tela / (int)raio);
+        
+        // Sorteia uma posição X e Y aleatória alinhada estritamente ao grid do jogo
+        int random_x = GetRandomValue(0, max_x - 1) * (int)raio; 
+        int random_y = GetRandomValue(0, max_y - 1) * (int)raio;
+
+        // Atribui as coordenadas sorteadas para a estrutura da maçã e ativa ela
+        maca->posicao = (Vector2){ (float)random_x, (float)random_y };
+        maca->ativa = true; 
+
+        // Sorteio da Maçã Dourada: 1 chance em 10 (10%)
+        int chance = GetRandomValue(1, 10);
+        if (chance == 1) {
+            maca->tipo = 2; // Dourada (Especial)
+        } else {
+            maca->tipo = 1; // Normal
+        }
+
+        // Percorre todo o corpo da cobra checando se há colisão com o local da maçã
+        posicao_valida = true;
+        Node *atual = cobra->inicio;
+        while (atual != NULL) {
+            if (atual->posicao.x == maca->posicao.x && atual->posicao.y == maca->posicao.y) {
+                // Se a maçã nasceu em cima de algum pedaço da cobra, invalidamos a posição
+                posicao_valida = false; // Bateu na cobra, tenta sortear de novo
+                break;
+            }
+            atual = atual->next;
+        }
+    }
+}

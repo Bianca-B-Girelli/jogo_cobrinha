@@ -14,8 +14,6 @@ typedef enum EstadoJogo {
     FIM         // Estado de Game Over
 } EstadoJogo;
 
-
-
 void mover_cobrinha(Cabecalho *cobra, float *contadorTempo, float tempoPasso, float raio_cobrinha, Vector2 direcao) {
     *contadorTempo += GetFrameTime();
 
@@ -173,6 +171,8 @@ int main(void) {
     Texture2D fundo = LoadTexture("imagens/fundo.png");
     Texture2D fundo2 = LoadTexture("imagens/fundo2.png");
     Texture2D fundoGameOver = LoadTexture("imagens/gameover.png");
+    Texture2D MacaNormal = LoadTexture("imagens/macaNormal.png");
+    Texture2D MacaDourada = LoadTexture("imagens/macaDourada.png");
 
 
     // FPS
@@ -180,11 +180,12 @@ int main(void) {
 
 
     // ---------------------------------------------------------------------------------
-    // INICIALIZAÇÃO DA COBRA
+    // INICIALIZAÇÃO DA COBRA E DA MAÇÃ
     // ---------------------------------------------------------------------------------
 
     // Inicialização do ponteiro da cobra gerenciado pela lista encadeada
     Cabecalho *cobra = NULL;
+    Maca maca;
 
 
     // Direção inicial da cobra
@@ -238,11 +239,14 @@ int main(void) {
                         Vector2 posInicial = { 600.0f, 400.0f };
                         inserir_fim(cobra, posInicial, SKYBLUE);
 
+                        // Gera a primeira maçã aleatória na tela 
+                        gerar_maca(&maca, cobra, largura_tela, altura_tela, raio_cobrinha);
+
                         cobraViva = true;
                         direcao = (Vector2){ 0, -1 };
                         contadorTempo = 0.0f;
                         estadoAtual = JOGANDO;
-                    } else if (opcaoSelecionada == 1) {
+                    }else if (opcaoSelecionada == 1) {
                         fecharJogo = true;
                     }
                 }
@@ -337,6 +341,31 @@ int main(void) {
                     mover_cobrinha(cobra, &contadorTempo, tempoPasso, raio_cobrinha, direcao);
 
                     // -------------------------------------------------------------
+                    // COLISÃO COM A MAÇÃ
+                    // -------------------------------------------------------------
+                    if (cobra->inicio->posicao.x == maca.posicao.x && cobra->inicio->posicao.y == maca.posicao.y) {
+                        
+                        // Define quantos quadrados vai crescer com base no tipo da maçã
+                        int quantidadeCrescer = (maca.tipo == 2) ? 3 : 1;
+
+                        for (int i = 0; i < quantidadeCrescer; i++) {
+                            if (cobra->fim != NULL) {
+                                // Pega a posição do último nó para adicionar o novo logo atrás
+                                Vector2 novaPos = cobra->fim->posicao; 
+                                
+                                // Cor diferente se for a dourada (GOLD) ou normal (BLUE)
+                                Color corSegmento = (maca.tipo == 2) ? GOLD : BLUE;
+                                
+                                inserir_fim(cobra, novaPos, corSegmento);
+                            }
+                        }
+
+                        // Gera uma nova maçã aleatória na tela (garantindo que não nasce em cima da cobra)
+                        gerar_maca(&maca, cobra, largura_tela, altura_tela, raio_cobrinha);
+                    }
+
+
+                    // -------------------------------------------------------------
                     // COLISÃO COM AS BORDAS
                     // -------------------------------------------------------------
                     
@@ -415,6 +444,21 @@ int main(void) {
                     }
                 }
 
+                // Desenha a maçã
+                if (maca.ativa) {
+                    Texture2D texturaParaDesenhar;
+
+                    // Se o tipo da maçã for igual a 1, usa a foto normal. Se não (é 2), usa a dourada.
+                    if (maca.tipo == 1) {
+                        texturaParaDesenhar = MacaNormal;
+                    } else {
+                        texturaParaDesenhar = MacaDourada;
+                    }
+
+                    // Desenha a textura escolhida na posição da maçã
+                    DrawTextureV(texturaParaDesenhar, maca.posicao, WHITE);
+                }
+
 
                 // Texto de dica
                 DrawText(
@@ -462,6 +506,8 @@ int main(void) {
     UnloadTexture(fundo);
     UnloadTexture(fundo2);
     UnloadTexture(fundoGameOver);
+    UnloadTexture(MacaNormal);
+    UnloadTexture(MacaDourada);
 
     CloseWindow();
 
