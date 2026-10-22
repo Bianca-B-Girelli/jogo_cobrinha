@@ -1,7 +1,7 @@
 #include "raylib.h"
 #include <stdbool.h>
 #include <stdio.h> 
-#include "cobra.h"
+#include "cobra.h" 
 
 
 // ---------------------------------------------------------------------------------
@@ -341,7 +341,7 @@ int main(void) {
                     mover_cobrinha(cobra, &contadorTempo, tempoPasso, raio_cobrinha, direcao);
 
                     // -------------------------------------------------------------
-                    // COLISÃO COM A MAÇÃ
+                    // COME COM A MAÇÃ
                     // -------------------------------------------------------------
                     if (cobra->inicio->posicao.x == maca.posicao.x && cobra->inicio->posicao.y == maca.posicao.y) {
                         
@@ -350,8 +350,11 @@ int main(void) {
 
                         for (int i = 0; i < quantidadeCrescer; i++) {
                             if (cobra->fim != NULL) {
-                                // Pega a posição do último nó para adicionar o novo logo atrás
-                                Vector2 novaPos = cobra->fim->posicao; 
+                                // Posiciona o novo segmento alinhado para trás com base na direção atual
+                                Vector2 novaPos = { 
+                                    cobra->fim->posicao.x - (direcao.x * raio_cobrinha), 
+                                    cobra->fim->posicao.y - (direcao.y * raio_cobrinha) 
+                                };
                                 
                                 // Cor diferente se for a dourada (GOLD) ou normal (BLUE)
                                 Color corSegmento = (maca.tipo == 2) ? GOLD : BLUE;
@@ -444,6 +447,21 @@ int main(void) {
                     }
                 }
 
+
+                //teste
+                if (maca.ativa) {
+                    // TESTE TEMPORÁRIO: Desenha um quadrado vermelho para a normal e dourado para a especial
+                    Color corMaca = (maca.tipo == 1) ? RED : GOLD;
+                    
+                    DrawRectangleV(
+                        maca.posicao,
+                        (Vector2){ raio_cobrinha, raio_cobrinha },
+                        corMaca
+                    );
+                }
+
+
+                /*
                 // Desenha a maçã
                 if (maca.ativa) {
                     Texture2D texturaParaDesenhar;
@@ -457,7 +475,9 @@ int main(void) {
 
                     // Desenha a textura escolhida na posição da maçã
                     DrawTextureV(texturaParaDesenhar, maca.posicao, WHITE);
-                }
+                } 
+*/
+
 
 
                 // Texto de dica
