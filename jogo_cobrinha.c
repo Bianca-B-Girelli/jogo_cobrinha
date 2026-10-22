@@ -341,30 +341,48 @@ int main(void) {
                     mover_cobrinha(cobra, &contadorTempo, tempoPasso, raio_cobrinha, direcao);
 
                     // -------------------------------------------------------------
-                    // COME COM A MAÇÃ
+                    // COMER MAÇÃ: colisão da cabeça da cobra com a maçã
                     // -------------------------------------------------------------
                     if (cobra->inicio->posicao.x == maca.posicao.x && cobra->inicio->posicao.y == maca.posicao.y) {
                         
-                        // Define quantos quadrados vai crescer com base no tipo da maçã
-                        int quantidadeCrescer = (maca.tipo == 2) ? 3 : 1;
-
-                        for (int i = 0; i < quantidadeCrescer; i++) {
+                        // Maçã Normal (+1)
+                        if (maca.tipo == 1) {
                             if (cobra->fim != NULL) {
-                                // Posiciona o novo segmento alinhado para trás com base na direção atual
                                 Vector2 novaPos = { 
                                     cobra->fim->posicao.x - (direcao.x * raio_cobrinha), 
                                     cobra->fim->posicao.y - (direcao.y * raio_cobrinha) 
                                 };
-                                
-                                // Cor diferente se for a dourada (GOLD) ou normal (BLUE)
-                                Color corSegmento = (maca.tipo == 2) ? GOLD : BLUE;
-                                
-                                inserir_fim(cobra, novaPos, corSegmento);
+                                inserir_fim(cobra, novaPos, BLUE);
+                            }
+                        }
+                        // Maçã Dourada (+3)
+                        else if (maca.tipo == 2) {
+                            for (int i = 0; i < 3; i++) {
+                                if (cobra->fim != NULL) {
+                                    Vector2 novaPos = { 
+                                        cobra->fim->posicao.x - (direcao.x * raio_cobrinha), 
+                                        cobra->fim->posicao.y - (direcao.y * raio_cobrinha) 
+                                    };
+                                    Color corSegmento = (i == 0) ? GOLD : BLUE;
+                                    inserir_fim(cobra, novaPos, corSegmento);
+                                }
+                            }
+                        }
+                        // Maçã Estragada (-1 ou Game Over)
+                        else if (maca.tipo == 3) {
+                            if (cobra->len == 1) {
+                                // Se tiver apenas a cabeça, morre imediatamente
+                                cobraViva = false;
+                                estadoAtual = FIM;
+                            } else {
+                                // Se for maior que 1, diminui um segmento
+                                remover_fim(cobra);
                             }
                         }
 
-                        // Gera uma nova maçã aleatória na tela (garantindo que não nasce em cima da cobra)
+                        // Gera uma nova maçã aleatória na tela
                         gerar_maca(&maca, cobra, largura_tela, altura_tela, raio_cobrinha);
+
                     }
 
 
@@ -448,20 +466,6 @@ int main(void) {
                 }
 
 
-                //teste
-                if (maca.ativa) {
-                    // TESTE TEMPORÁRIO: Desenha um quadrado vermelho para a normal e dourado para a especial
-                    Color corMaca = (maca.tipo == 1) ? RED : GOLD;
-                    
-                    DrawRectangleV(
-                        maca.posicao,
-                        (Vector2){ raio_cobrinha, raio_cobrinha },
-                        corMaca
-                    );
-                }
-
-
-                /*
                 // Desenha a maçã
                 if (maca.ativa) {
                     Texture2D texturaParaDesenhar;
@@ -475,8 +479,7 @@ int main(void) {
 
                     // Desenha a textura escolhida na posição da maçã
                     DrawTextureV(texturaParaDesenhar, maca.posicao, WHITE);
-                } 
-*/
+                }
 
 
 

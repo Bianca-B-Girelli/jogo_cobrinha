@@ -39,4 +39,6 @@ void destruir_cobra(Cabecalho *cobra);
 
 void gerar_maca(Maca *maca, Cabecalho *cobra, int largura_tela, int altura_tela, float raio);
 
+void remover_fim(Cabecalho *cobra);
+
 #endif // COBRA_H

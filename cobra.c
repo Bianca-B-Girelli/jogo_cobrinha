@@ -5,7 +5,7 @@ Cabecalho* criar_cobra(void) {
     if (cobra == NULL) {
         printf("Erro ao alocar memória para o cabeçalho.\n");
         return NULL;
-    }
+    } 
     cobra->inicio = NULL;
     cobra->fim = NULL;
     cobra->len = 0;
@@ -71,12 +71,14 @@ void gerar_maca(Maca *maca, Cabecalho *cobra, int largura_tela, int altura_tela,
         maca->posicao = (Vector2){ (float)random_x, (float)random_y };
         maca->ativa = true; 
 
-        // Sorteio da Maçã Dourada: 1 chance em 10 (10%)
-        int chance = GetRandomValue(1, 10);
+        /// Sorteio dos tipos de maçã (Total de 20 chances)
+        int chance = GetRandomValue(1, 20);
         if (chance == 1) {
-            maca->tipo = 2; // Dourada (Especial)
+            maca->tipo = 2; // Dourada 
+        } else if (chance == 2) {
+            maca->tipo = 3; // Estragada 
         } else {
-            maca->tipo = 1; // Normal
+            maca->tipo = 1; // Normal 
         }
 
         // Percorre todo o corpo da cobra checando se há colisão com o local da maçã
@@ -91,4 +93,31 @@ void gerar_maca(Maca *maca, Cabecalho *cobra, int largura_tela, int altura_tela,
             atual = atual->next;
         }
     }
+}
+
+void remover_fim(Cabecalho *cobra) {
+    if (cobra == NULL || cobra->len <= 1) return; // não remove se for nulo ou menor/igual a 1
+
+    if (cobra->inicio == cobra->fim) {
+        // Se por acaso tiver só a cabeça
+        free(cobra->inicio);
+        cobra->inicio = NULL;
+        cobra->fim = NULL;
+        cobra->len = 0;
+        return;
+    }
+
+    // Percorre até encontrar o penúltimo nó
+    Node *atual = cobra->inicio;
+    while (atual->next != cobra->fim) {
+        atual = atual->next;
+    }
+
+    // Libera o último nó atual
+    free(cobra->fim);
+    
+    // O penúltimo passa a ser o novo fim
+    cobra->fim = atual;
+    cobra->fim->next = NULL;
+    cobra->len--;
 }
