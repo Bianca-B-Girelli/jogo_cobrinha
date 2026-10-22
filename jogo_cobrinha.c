@@ -173,6 +173,7 @@ int main(void) {
     Texture2D fundoGameOver = LoadTexture("imagens/gameover.png");
     Texture2D MacaNormal = LoadTexture("imagens/macaNormal.png");
     Texture2D MacaDourada = LoadTexture("imagens/macaDourada.png");
+    Texture2D MacaEstragada = LoadTexture("imagens/macaEstragada.png");
 
 
     // FPS
@@ -382,7 +383,6 @@ int main(void) {
 
                         // Gera uma nova maçã aleatória na tela
                         gerar_maca(&maca, cobra, largura_tela, altura_tela, raio_cobrinha);
-
                     }
 
 
@@ -470,14 +470,14 @@ int main(void) {
                 if (maca.ativa) {
                     Texture2D texturaParaDesenhar;
 
-                    // Se o tipo da maçã for igual a 1, usa a foto normal. Se não (é 2), usa a dourada.
                     if (maca.tipo == 1) {
                         texturaParaDesenhar = MacaNormal;
-                    } else {
+                    } else if (maca.tipo == 2) {
                         texturaParaDesenhar = MacaDourada;
+                    } else {
+                        texturaParaDesenhar = MacaEstragada; // Tipo 3
                     }
 
-                    // Desenha a textura escolhida na posição da maçã
                     DrawTextureV(texturaParaDesenhar, maca.posicao, WHITE);
                 }
 
@@ -531,6 +531,7 @@ int main(void) {
     UnloadTexture(fundoGameOver);
     UnloadTexture(MacaNormal);
     UnloadTexture(MacaDourada);
+    UnloadTexture(MacaEstragada);
 
     CloseWindow();
 
