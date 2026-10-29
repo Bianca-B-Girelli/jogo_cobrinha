@@ -11,5 +11,8 @@ add_custom_command(
     COMMAND ${CMAKE_COMMAND} -E copy_directory
         "${CMAKE_CURRENT_SOURCE_DIR}/imagens"
         "$<TARGET_FILE_DIR:${PROJECT_NAME}>/imagens"
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+        "${CMAKE_CURRENT_SOURCE_DIR}/sons"
+        "$<TARGET_FILE_DIR:${PROJECT_NAME}>/sons"
     COMMENT "Copying assets folder to the build directory..."
 )

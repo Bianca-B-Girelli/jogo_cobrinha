@@ -52,7 +52,7 @@ void mover_cobrinha(Cabecalho *cobra, float *contadorTempo, float tempoPasso, fl
 }
 
 
-void encerrar_jogo(Cabecalho *cobra, int largura_tela, int altura_tela, float raio_cobrinha, EstadoJogo *estadoAtual, bool *viva) {
+void encerrar_jogo(Cabecalho *cobra, int largura_tela, int altura_tela, float raio_cobrinha, EstadoJogo *estadoAtual, bool *viva, Sound somGameOver) {
     if (cobra == NULL || cobra->inicio == NULL) return;
 
     Vector2 cabeca = cobra->inicio->posicao;
@@ -61,7 +61,7 @@ void encerrar_jogo(Cabecalho *cobra, int largura_tela, int altura_tela, float ra
         cabeca.x > (float)largura_tela - raio_cobrinha ||
         cabeca.y < 0 ||
         cabeca.y > (float)altura_tela - raio_cobrinha) {
-
+        PlaySound(somGameOver);
         *viva = false;
         *estadoAtual = FIM;
         return;
@@ -74,6 +74,7 @@ void encerrar_jogo(Cabecalho *cobra, int largura_tela, int altura_tela, float ra
         while (atual != NULL) {
             //checa se a cabeça está colidindo com corpo
             if (cabeca.x == atual->posicao.x && cabeca.y == atual->posicao.y) {
+                PlaySound(somGameOver); 
                 *viva = false;
                 *estadoAtual = FIM;
                 break; 
@@ -175,6 +176,14 @@ int main(void) {
     Texture2D MacaDourada = LoadTexture("imagens/macaDourada.png");
     Texture2D MacaEstragada = LoadTexture("imagens/macaEstragada.png");
 
+    // Inicializa o dispositivo de áudio
+    InitAudioDevice(); 
+
+    // Carregando os efeitos sonoros em .wav (certifique-se de que os arquivos estão na pasta 'sons/')
+    Sound somMacaNormal = LoadSound("sons/som_macaNormal.wav");
+    Sound somMacaDourada = LoadSound("sons/som_macaDourada.wav");
+    Sound somGameOver = LoadSound("sons/som_gameOver.wav");
+
 
     // FPS
     SetTargetFPS(60);
@@ -230,6 +239,7 @@ int main(void) {
                 // Processamento de seleção
                 if (IsKeyPressed(KEY_ENTER)) {
                     if (opcaoSelecionada == 0) {
+
                         // Limpa a cobra anterior se existir
                         if (cobra != NULL) {
                             destruir_cobra(cobra);
@@ -283,12 +293,12 @@ int main(void) {
                     }
 
 
-                    // Direita
                     if ((IsKeyPressed(KEY_RIGHT) ||
                          IsKeyPressed(KEY_D)) &&
                         direcao.x == 0) {
 
                         direcao = (Vector2){ 1, 0 };
+
                     }
 
 
@@ -348,6 +358,7 @@ int main(void) {
                         
                         // Maçã Normal (+1)
                         if (maca.tipo == 1) {
+                            PlaySound(somMacaNormal);
                             if (cobra->fim != NULL) {
                                 Vector2 novaPos = { 
                                     cobra->fim->posicao.x - (direcao.x * raio_cobrinha), 
@@ -358,20 +369,22 @@ int main(void) {
                         }
                         // Maçã Dourada (+3)
                         else if (maca.tipo == 2) {
+                            PlaySound(somMacaDourada);
                             for (int i = 0; i < 3; i++) {
                                 if (cobra->fim != NULL) {
                                     Vector2 novaPos = { 
                                         cobra->fim->posicao.x - (direcao.x * raio_cobrinha), 
                                         cobra->fim->posicao.y - (direcao.y * raio_cobrinha) 
                                     };
-                                    Color corSegmento = (i == 0) ? GOLD : BLUE;
-                                    inserir_fim(cobra, novaPos, corSegmento);
+                                    
+                                    inserir_fim(cobra, novaPos, GOLD);
                                 }
                             }
                         }
                         // Maçã Estragada (-1 ou Game Over)
                         else if (maca.tipo == 3) {
                             if (cobra->len == 1) {
+                                PlaySound(somGameOver);
                                 // Se tiver apenas a cabeça, morre imediatamente
                                 cobraViva = false;
                                 estadoAtual = FIM;
@@ -391,7 +404,7 @@ int main(void) {
                     // -------------------------------------------------------------
                     
                     // ALTERAÇÃO: Passa os ponteiros corretos da lista e da flag cobraViva
-                    encerrar_jogo(cobra, largura_tela, altura_tela, raio_cobrinha, &estadoAtual, &cobraViva);
+                    encerrar_jogo(cobra, largura_tela, altura_tela, raio_cobrinha, &estadoAtual, &cobraViva, somGameOver);
                 }
 
                 break;
@@ -406,9 +419,8 @@ int main(void) {
 
                 // Pressiona ENTER para voltar ao menu
                 if (IsKeyPressed(KEY_ENTER)) {
-
+                    
                     cobraViva = true; //Removi 'cobrinha[0].viva = true' para usar 'cobraViva'
-
                     estadoAtual = MENU;
                 }
 
@@ -533,8 +545,15 @@ int main(void) {
     UnloadTexture(MacaDourada);
     UnloadTexture(MacaEstragada);
 
-    CloseWindow();
+    // Descarrega os sons
+    UnloadSound(somMacaNormal);
+    UnloadSound(somMacaDourada);
+    UnloadSound(somGameOver);
 
+    // Fecha o dispositivo de áudio
+    CloseAudioDevice();
+
+    CloseWindow();
 
     return 0;
 }
