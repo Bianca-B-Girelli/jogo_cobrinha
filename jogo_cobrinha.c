@@ -110,7 +110,7 @@ void desenhar_menu(Texture2D fundo, int opcaoSelecionada, int largura_tela) {
     DrawText(footer, largura_tela / 2.6 - footerWidth / 2, 600, 24, BLACK);
 }
 
-void desenhar_game_over(Texture2D fundoGameOver, int largura_tela, int altura_tela) {
+void desenhar_game_over(Texture2D fundoGameOver, int largura_tela, int altura_tela, int pontuacao) {
     // Fundo da tela de Game Over
     if (fundoGameOver.id > 0) {
         DrawTexture(fundoGameOver, 0, 0, WHITE);
@@ -131,7 +131,7 @@ void desenhar_game_over(Texture2D fundoGameOver, int largura_tela, int altura_te
 
     // Exibe a pontuação final na tela de Game Over
     char bufferPontos[50];
-    sprintf(bufferPontos, "Pontuacao Final: %d", pontuacaoFinal);
+    sprintf(bufferPontos, "Pontuacao Final: %d", pontuacao);
     int larguraPontos = MeasureText(bufferPontos, 30);
     DrawText(bufferPontos, (largura_tela - larguraPontos) / 2, (altura_tela - tamanhoFonte) / 2 + 30, 30, BLACK);
 
@@ -525,10 +525,10 @@ int main(void) {
                 char textoPontos[30];
                 sprintf(textoPontos, "Pontos: %d", pontuacao);
                 int tamanhoTexto = 30;
-                int larguraTexto = MeasureText(textoPosicaoToString ? textoPontos : textoPontos, tamanhoTexto); 
+                int larguraTexto = MeasureText(textoPontos, tamanhoTexto);
 
                 DrawText(textoPontos, largura_tela - larguraTexto - 30, altura_tela - 60, tamanhoTexto, DARKGRAY);
-
+                
                 break;
             }
 
@@ -539,7 +539,7 @@ int main(void) {
 
             case FIM: {
 
-                desenhar_game_over(fundoGameOver, largura_tela, altura_tela);
+                desenhar_game_over(fundoGameOver, largura_tela, altura_tela, pontuacao);
                 break;
             }
             
