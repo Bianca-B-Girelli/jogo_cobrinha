@@ -133,7 +133,7 @@ void desenhar_game_over(Texture2D fundoGameOver, int largura_tela, int altura_te
     char bufferPontos[50];
     sprintf(bufferPontos, "Pontuacao Final: %d", pontuacao);
     int larguraPontos = MeasureText(bufferPontos, 30);
-    DrawText(bufferPontos, (largura_tela - larguraPontos) / 2, (altura_tela - tamanhoFonte) / 2 + 30, 30, BLACK);
+    DrawText(bufferPontos, (largura_tela - larguraPontos) / 2, (altura_tela - tamanhoFonte) / 2 + 150, 30, BLACK);
 
     // Mensagem de instrução
     const char* mensagem = "Pressione ENTER para voltar ao menu";
@@ -171,8 +171,7 @@ int main(void) {
     InitWindow(largura_tela, altura_tela, "Jogo Da Cobrinha");
 
     // Impede que uma tecla feche a janela automaticamente
-    SetExitKey(KEY_P);
-
+    SetExitKey(KEY_P);            
 
     // ---------------------------------------------------------------------------------
     // CARREGAMENTO DAS TEXTURAS
@@ -191,8 +190,9 @@ int main(void) {
     // Carregando os efeitos sonoros em .wav (certifique-se de que os arquivos estão na pasta 'sons/')
     Sound somMacaNormal = LoadSound("sons/som_macaNormal.wav");
     Sound somMacaDourada = LoadSound("sons/som_macaDourada.wav");
+    Sound somMacaEstragada = LoadSound("sons/som_macaEstragada.wav");
     Sound somGameOver = LoadSound("sons/som_gameOver.wav");
-
+    
 
     // FPS
     SetTargetFPS(60);
@@ -399,6 +399,8 @@ int main(void) {
                         }
                         // Maçã Estragada (-1 ou Game Over)
                         else if (maca.tipo == 3) {
+                            PlaySound(somMacaEstragada);
+                            pontuacao -= 10;
                             if (cobra->len == 1) {
                                 PlaySound(somGameOver);
                                 pontuacao -= 10;
@@ -526,9 +528,8 @@ int main(void) {
                 sprintf(textoPontos, "Pontos: %d", pontuacao);
                 int tamanhoTexto = 30;
                 int larguraTexto = MeasureText(textoPontos, tamanhoTexto);
+                DrawText(textoPontos, largura_tela - larguraTexto - 30, altura_tela - 60, tamanhoTexto, PINK);
 
-                DrawText(textoPontos, largura_tela - larguraTexto - 30, altura_tela - 60, tamanhoTexto, DARKGRAY);
-                
                 break;
             }
 
@@ -570,7 +571,9 @@ int main(void) {
     // Descarrega os sons
     UnloadSound(somMacaNormal);
     UnloadSound(somMacaDourada);
+    UnloadSound(somMacaEstragada);
     UnloadSound(somGameOver);
+
 
     // Fecha o dispositivo de áudio
     CloseAudioDevice();
