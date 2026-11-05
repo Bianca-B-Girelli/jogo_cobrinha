@@ -129,6 +129,12 @@ void desenhar_game_over(Texture2D fundoGameOver, int largura_tela, int altura_te
         RED
     );
 
+    // Exibe a pontuação final na tela de Game Over
+    char bufferPontos[50];
+    sprintf(bufferPontos, "Pontuacao Final: %d", pontuacaoFinal);
+    int larguraPontos = MeasureText(bufferPontos, 30);
+    DrawText(bufferPontos, (largura_tela - larguraPontos) / 2, (altura_tela - tamanhoFonte) / 2 + 30, 30, BLACK);
+
     // Mensagem de instrução
     const char* mensagem = "Pressione ENTER para voltar ao menu";
     int tamanhoMensagem = 24;
@@ -158,6 +164,9 @@ int main(void) {
 
     // ALTERAÇÃO: Adicionada a variável cobraViva para controlar o estado da lista
     bool cobraViva = true;
+
+    // Variável de pontuação 
+    int pontuacao = 0;
 
     InitWindow(largura_tela, altura_tela, "Jogo Da Cobrinha");
 
@@ -244,6 +253,9 @@ int main(void) {
                         if (cobra != NULL) {
                             destruir_cobra(cobra);
                         }
+
+                        // Reseta a pontuação ao iniciar um novo jogo
+                        pontuacao = 0;
 
                         // ALTERAÇÃO: Cria a cobra apenas com a cabeça (1 nó)
                         cobra = criar_cobra();
@@ -339,6 +351,7 @@ int main(void) {
                             destruir_cobra(cobra);
                         }
 
+                        pontuacao = 0; // Zera a pontuação também ao reiniciar por espaço
                         cobra = criar_cobra();
                         Vector2 posInicial = { 600.0f, 400.0f };
                         inserir_fim(cobra, posInicial, SKYBLUE);
@@ -356,9 +369,11 @@ int main(void) {
                     // -------------------------------------------------------------
                     if (cobra->inicio->posicao.x == maca.posicao.x && cobra->inicio->posicao.y == maca.posicao.y) {
                         
-                        // Maçã Normal (+1)
+        
+                        // Maçã Normal (+10 pontos)
                         if (maca.tipo == 1) {
                             PlaySound(somMacaNormal);
+                            pontuacao += 10;
                             if (cobra->fim != NULL) {
                                 Vector2 novaPos = { 
                                     cobra->fim->posicao.x - (direcao.x * raio_cobrinha), 
@@ -367,9 +382,10 @@ int main(void) {
                                 inserir_fim(cobra, novaPos, BLUE);
                             }
                         }
-                        // Maçã Dourada (+3)
+                        // Maçã Dourada (+30 pontos)
                         else if (maca.tipo == 2) {
                             PlaySound(somMacaDourada);
+                            pontuacao += 30;
                             for (int i = 0; i < 3; i++) {
                                 if (cobra->fim != NULL) {
                                     Vector2 novaPos = { 
@@ -385,6 +401,7 @@ int main(void) {
                         else if (maca.tipo == 3) {
                             if (cobra->len == 1) {
                                 PlaySound(somGameOver);
+                                pontuacao -= 10;
                                 // Se tiver apenas a cabeça, morre imediatamente
                                 cobraViva = false;
                                 estadoAtual = FIM;
@@ -503,9 +520,14 @@ int main(void) {
                     20,
                     BLACK
                 );
+                
+                // Exibe a pontuação atual na tela
+                char textoPontos[30];
+                sprintf(textoPontos, "Pontos: %d", pontuacao);
+                int tamanhoTexto = 30;
+                int larguraTexto = MeasureText(textoPosicaoToString ? textoPontos : textoPontos, tamanhoTexto); 
 
-                // ALTERAÇÃO: Dicas das teclas de teste adicionadas na tela
-                DrawText("Tecla C: Aumenta a cobra | ESPACO: Reinicia a lista", 20, 50, 20, BLACK);
+                DrawText(textoPontos, largura_tela - larguraTexto - 30, altura_tela - 60, tamanhoTexto, DARKGRAY);
 
                 break;
             }
